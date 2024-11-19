@@ -1,6 +1,14 @@
 ---
+# == Re-useable Definitions ==================================================
 
-version: "3.9"
+# Default service definition for all (incl. postgres/redis/...)
+x-service-default: &service_default
+  env_file:
+    - .env
+  networks:
+    - internal_net
+    - external_net
+  restart: unless-stopped
 
 
 # == Services ===============================================================
@@ -13,7 +21,8 @@ services:
   # persistent storage.
 
   postgres:
-    image: ${image_postgres_name:-postgres}:${image_postgres_version:-12}
+    <<: *service_default
+    image: postgres:16-alpine
     container_name: postgres
     hostname: postgres
     secrets:
@@ -22,10 +31,6 @@ services:
       - type: bind
         source: ${volumes_basedir:-./volumes}/postgres/data
         target: /var/lib/postgresql/data
-    env_file:
-      - .env
-    networks:
-      - internal_net
 
   # -- redis -----------------------------------------------------------------
   #
@@ -33,22 +38,22 @@ services:
   # persistent storage.
 
   redis:
-    image: ${image_redis_name:-redis}:${image_redis_version:-7}
+    <<: *service_default
+    image: redis:alpine
     container_name: redis
     hostname: redis
     volumes:
       - type: bind
         source: ${volumes_basedir:-./volumes}/redis/data
         target: /data
-    networks:
-      - internal_net
 
   # -- pgAdmin ----------------------------------------------------------------
   #
   # Useful for interactive database administration.
 
   pgadmin:
-    image: "${image_pgadmin_name:-dpage/pgadmin4}:${image_pgadmin_version:-latest}"
+    <<: *service_default
+    image: dpage/pgadmin4:8.3
     container_name: pgadmin
     hostname: pgadmin
     secrets:
@@ -63,9 +68,6 @@ services:
       - type: bind
         source: ${config_basedir:-./config}/pgadmin/servers.json
         target: /pgadmin4/servers.json
-    networks:
-      - internal_net
-      - external_net
 
 
 # == Secrets ================================================================
