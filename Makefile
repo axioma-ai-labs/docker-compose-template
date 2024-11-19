@@ -22,11 +22,11 @@ SHELLCHECK_EXCLUDES := SC2012,SC2046,SC2086
 
 .PHONY: lint-shellcheck
 lint-shellcheck:
-	shellcheck --allow-empty -e $(SHELLCHECK_EXCLUDES) *.sh
+	shellcheck -e $(SHELLCHECK_EXCLUDES) *.sh
 
 .PHONY: format
 format: format-shellcheck
 
 .PHONY: format-shellcheck
 format-shellcheck:
-	shellcheck --allow-empty -e $(SHELLCHECK_EXCLUDES) -f diff *.sh | git apply
+	shellcheck -e $(SHELLCHECK_EXCLUDES) -f diff *.sh | git apply --allow-empty

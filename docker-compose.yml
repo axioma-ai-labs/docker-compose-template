@@ -1,3 +1,5 @@
+---
+
 version: "3.9"
 
 
@@ -61,6 +63,9 @@ services:
       - type: bind
         source: ${config_basedir:-./config}/pgadmin/servers.json
         target: /pgadmin4/servers.json
+    networks:
+      - internal_net
+      - external_net
 
 
 # == Secrets ================================================================
