@@ -1,0 +1,10 @@
+services:
+  backend:
+    image: backend-axioma
+    ports:
+      - '8080:8080'
+
+  frontend:
+    image: frontend-axioma
+    ports:
+      - '8080:8080'

@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run YAML linting
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: |
+            *.yml
+            .github/workflows/*.yml

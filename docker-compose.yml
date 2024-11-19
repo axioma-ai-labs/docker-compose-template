@@ -1,0 +1,85 @@
+version: "3.9"
+
+
+# == Services ===============================================================
+
+services:
+
+  # -- PostgreSQL Server -----------------------------------------------------
+  #
+  # We use the default configuration, but mount a volume for the data for
+  # persistent storage.
+
+  postgres:
+    image: ${image_postgres_name:-postgres}:${image_postgres_version:-12}
+    container_name: postgres
+    hostname: postgres
+    secrets:
+      - db-password
+    volumes:
+      - type: bind
+        source: ${volumes_basedir:-./volumes}/postgres/data
+        target: /var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - internal_net
+
+  # -- redis -----------------------------------------------------------------
+  #
+  # We use the default configuration, but mount a volume for the data for
+  # persistent storage.
+
+  redis:
+    image: ${image_redis_name:-redis}:${image_redis_version:-7}
+    container_name: redis
+    hostname: redis
+    volumes:
+      - type: bind
+        source: ${volumes_basedir:-./volumes}/redis/data
+        target: /data
+    networks:
+      - internal_net
+
+  # -- pgAdmin ----------------------------------------------------------------
+  #
+  # Useful for interactive database administration.
+
+  pgadmin:
+    image: "${image_pgadmin_name:-dpage/pgadmin4}:${image_pgadmin_version:-latest}"
+    container_name: pgadmin
+    hostname: pgadmin
+    secrets:
+      - db-password
+      - pgadmin-password
+    depends_on:
+      - postgres
+    volumes:
+      - type: bind
+        source: ${volumes_basedir:-./volumes}/pgadmin/data
+        target: /private/var/lib/pgadmin
+      - type: bind
+        source: ${config_basedir:-./config}/pgadmin/servers.json
+        target: /pgadmin4/servers.json
+
+
+# == Secrets ================================================================
+
+secrets:
+  # The PostgreSQL database password.
+  db-password:
+    file: ${secrets_basedir:-./secrets}/db-password
+  # The pgAdmin admin password.
+  pgadmin-password:
+    file: ${secrets_basedir:-./secrets}/pgadmin-password
+
+
+# == Networks ===============================================================
+
+networks:
+  internal_net:
+    driver: bridge
+    internal: true
+  external_net:
+    driver: bridge
+
