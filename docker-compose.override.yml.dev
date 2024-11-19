@@ -1,10 +1,15 @@
 services:
-  backend:
-    image: backend-axioma
+  # map postgres port to 3020
+  postgres:
     ports:
-      - '8080:8080'
+      - "3020:5432"
 
-  frontend:
-    image: frontend-axioma
+  # map redis port to 3030
+  redis:
     ports:
-      - '8080:8080'
+      - "3030:6379"
+    
+  # map pgadminport to 3041
+  pgadmin:
+    ports:
+      - "3041:80"
