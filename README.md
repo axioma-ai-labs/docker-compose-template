@@ -45,15 +45,27 @@ mkdir -p config/pgadmin
 cp utils/pgadmin/servers.json config/pgadmin
 ```
 
-5. Run the docker compose
+6. Copy the override file
+
+```bash
+cp docker-compose.override.yml.dev docker-compose.override.yml
+```
+
+> [!NOTE]
+> The `docker-compose.override.yml.dev` file is used to run the docker compose in development mode.
+> The `docker-compose.override.yml.prod` file is used to scale the backend and frontend.
+> Review the ports and other settings in the `docker-compose.override.yml` file.
+
+7. Run the docker compose
 
 ```bash
 docker-compose up -d
 ```
 
-## How to scale or run in development mode
+## Accessing the services
 
-> [!NOTE]
-> The `docker-compose.override.yml.prod` file is used to scale the backend and frontend.
-> The `docker-compose.override.yml.dev` file is used to run the docker compose in development mode.
-> To apply the override file, copy it to `docker-compose.override.yml` and run the docker compose.
+With the default configuration, you can access the services at the following ports:
+
+- Postgres: http://localhost:3020
+- Redis: http://localhost:3030
+- pgAdmin: http://localhost:3041
