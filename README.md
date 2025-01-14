@@ -1,4 +1,6 @@
 # docker-compose-template
+[![CI](https://github.com/axioma-ai-labs/docker-compose-template/actions/workflows/ci.yml/badge.svg)](https://github.com/axioma-ai-labs/docker-compose-template/actions/workflows/ci.yml)
+
 Template for Docker Compose Orchestrations.
 
 ## How to use
