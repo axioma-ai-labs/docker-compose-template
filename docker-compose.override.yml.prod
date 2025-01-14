@@ -1,8 +1,14 @@
-services:
-  frontend:
-    deploy:
-      replicas: 2
+---
 
-  backend:
-    deploy:
-      replicas: 8
+services:
+
+  # == Core Services =======================================================
+
+  postgres:
+    ports:
+      - "3020:5432"
+
+  redis:
+    ports:
+      - "3030:6379"
+

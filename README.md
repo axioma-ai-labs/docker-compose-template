@@ -16,6 +16,7 @@ cp .env.example .env
 
 > [!WARNING]
 > Configure the environment variables with your own values.
+> Pay attention to the REDIS_PASSWORD in the .env file. It must be the same as the password in the redis.conf file and respective to the REDIS_PASSWORD_FILE in the docker-compose.yml file.
 
 3. Create the volumes
 
@@ -25,6 +26,12 @@ mkdir -p volumes/redis/data
 mkdir -p volumes/pgadmin/data
 ```
 
+Give right permissions to the volumes
+
+```bash
+chmod -R 777 volumes
+```
+
 4. Create the secrets
 
 ```bash
@@ -32,8 +39,17 @@ echo db-password >secrets/db-password
 echo pgadmin-password >secrets/pgadmin-password
 ```
 
+Give the right permissions to the secrets:
+
+```bash
+chmod -R 777 secrets
+```
+
 > [!WARNING]
 > Configure the secrets with your own values!
+
+> [!NOTE]
+> The `redis-password` must be the same as the password in the redis.conf file and REDIS_PASSWORD in the .env file. See next sections for more details.
 
 5. Setup the configuration
 
@@ -43,7 +59,19 @@ cp utils/nginx/nginx.conf config/nginx
 
 mkdir -p config/pgadmin
 cp utils/pgadmin/servers.json config/pgadmin
+
+mkdir -p config/redis
+cp utils/redis/redis.conf config/redis
 ```
+
+Give the right permissions to the directories:
+
+```bash
+chmod -R 777 config
+```
+
+> [!NOTE]
+> The `redis.conf` file is used to configure the redis database. The password must be the same as the password in the `secrets/redis-password` file and REDIS_PASSWORD in the .env file.
 
 6. Copy the override file
 
@@ -69,3 +97,4 @@ With the default configuration, you can access the services at the following por
 - Postgres: http://localhost:3020
 - Redis: http://localhost:3030
 - pgAdmin: http://localhost:3041
+- Redis Commander: http://localhost:3031

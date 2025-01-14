@@ -1,15 +1,25 @@
+---
+
 services:
-  # map postgres port to 3020
+
+  # == Core Services =======================================================
+
   postgres:
     ports:
       - "3020:5432"
 
-  # map redis port to 3030
-  redis:
-    ports:
-      - "3030:6379"
-    
-  # map pgadminport to 3041
+  # redis:
+  #   ports:
+  #     - "3030:6379"
+
+  # == Monitoring Services ==================================================
+
   pgadmin:
     ports:
       - "3041:80"
+    deploy:
+      replicas: 0
+
+  redis-commander:
+    deploy:
+      replicas: 0

@@ -1,4 +1,5 @@
 ---
+
 # == Re-useable Definitions ==================================================
 
 # Default service definition for all (incl. postgres/redis/...)
@@ -15,6 +16,8 @@ x-service-default: &service_default
 
 services:
 
+  # == Core Services =======================================================
+
   # -- PostgreSQL Server -----------------------------------------------------
   #
   # We use the default configuration, but mount a volume for the data for
@@ -25,6 +28,8 @@ services:
     image: postgres:16-alpine
     container_name: postgres
     hostname: postgres
+    ports:
+      - "5432:5432"
     secrets:
       - db-password
     volumes:
@@ -32,7 +37,7 @@ services:
         source: ${volumes_basedir:-./volumes}/postgres/data
         target: /var/lib/postgresql/data
 
-  # -- redis -----------------------------------------------------------------
+  # -- Redis -----------------------------------------------------------------
   #
   # We use the default configuration, but mount a volume for the data for
   # persistent storage.
@@ -42,10 +47,18 @@ services:
     image: redis:alpine
     container_name: redis
     hostname: redis
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    ports:
+      - "6379:6379"
     volumes:
       - type: bind
         source: ${volumes_basedir:-./volumes}/redis/data
         target: /data
+      - type: bind
+        source: ${config_basedir:-./config}/redis/redis.conf
+        target: /etc/redis/redis.conf
+
+  # == Monitoring Services ===================================================
 
   # -- pgAdmin ----------------------------------------------------------------
   #
@@ -69,6 +82,29 @@ services:
         source: ${config_basedir:-./config}/pgadmin/servers.json
         target: /pgadmin4/servers.json
 
+  # -- Redis Commander --------------------------------------------------------
+  #
+  # A web UI for Redis.
+
+  redis-commander:
+    <<: *service_default
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    hostname: redis-commander
+    depends_on:
+      - redis
+    secrets:
+      - redis-password
+      - redis-commander-password
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+      REDIS_DB: 0
+      # UI Authentication
+      HTTP_USER: admin
+      HTTP_PASSWORD_FILE: /run/secrets/redis-commander-password
+
 
 # == Secrets ================================================================
 
@@ -79,7 +115,12 @@ secrets:
   # The pgAdmin admin password.
   pgadmin-password:
     file: ${secrets_basedir:-./secrets}/pgadmin-password
-
+  # The Redis password.
+  redis-password:
+    file: ${secrets_basedir:-./secrets}/redis-password
+  # The Redis Commander UI password.
+  redis-commander-password:
+    file: ${secrets_basedir:-./secrets}/redis-commander-password
 
 # == Networks ===============================================================
 
@@ -89,4 +130,3 @@ networks:
     internal: true
   external_net:
     driver: bridge
-
